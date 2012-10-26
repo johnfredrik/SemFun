@@ -1,0 +1,9 @@
+@charset 'UTF-8';
+
+.title {color:red;
+		font-family: Helvetica;
+}
+
+.made {
+	float:right;
+}

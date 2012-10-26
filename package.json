@@ -1,0 +1,9 @@
+{
+	"name" : "SemFun",
+	"version" : "0.0.1",
+	"author" : "John Fredrik Asphaug",
+
+	"dependencies" : {
+	"express" : "*"
+}
+}
