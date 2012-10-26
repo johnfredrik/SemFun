@@ -1,6 +1,7 @@
 var querystring = require('querystring');
 var http = require('http');
 
+
 var body = '<html>' +
       '<head>' +
       '<meta http-equiv="Content-Type" content="text/html; ' +
@@ -8,7 +9,7 @@ var body = '<html>' +
       '<link rel="stylesheet" type="text/css" href="css/style.css" />' +
       '</head>' +
       '<body>' +
-      '<form action="/checklist" method="POST">' +
+      '<form action="/checklist" method="GET">' +
       '<select name="uri" id="uri">' +
       '<option value="http://dbtune.org/magnatune/artist/skitzo">Skitzo</option>' +
       '<option value="http://dbtune.org/magnatune/artist/carrai">Carrai</option>' +
@@ -20,16 +21,17 @@ var body = '<html>' +
 
 
 
-function start(response, postData) {
+function start(req, res) {
   console.log("Request handler start was called.");
-  response.writeHead(200, {"Content-Type": "text/html"});
-  response.write(body);
-  response.end();
+  res.writeHead(200, {"Content-Type": "text/html"});
+  res.write(body);
+  res.end();
 }
 
-function checklist(response, postData) {
-  var uri = postData.substr(4);
-  console.log("Request handler checklist was called with postData " + uri);
+function checklist(req, res) {
+  
+  var uri = req.param('uri');
+  console.log("Request handler checklist was called with params " + req.param('uri'));
 
 
   var prefix = 'PREFIX foaf: <http://xmlns.com/foaf/0.1/>',
@@ -46,16 +48,16 @@ function checklist(response, postData) {
       method: 'GET'
     },
 
-    req = http.request(options, function (res) {
+    request = http.request(options, function (response) {
       console.log('STATUS: ' + res.statusCode);
       console.log('HEADERS: ' + JSON.stringify(res.headers));
-      res.setEncoding('utf8');
-      res.on('data', function (chunk) {
+      response.setEncoding('utf8');
+      response.on('data', function (chunk) {
        // console.log('BODY: ' + chunk);
         datajson += chunk;
       });
 
-      res.on('end', function () {
+      response.on('end', function () {
         var json = JSON.parse(datajson),
           madeTitle = "",
           i = 0,
@@ -65,16 +67,16 @@ function checklist(response, postData) {
             '<p class="title">' + JSON.stringify(json.results.bindings[i].title.value) + '</p>';
         }
 
-        response.writeHead(200, {"Content-Type": "text/html"});
-        response.write(body + madeTitle);
-        response.end();
+        res.writeHead(200, {"Content-Type": "text/html"});
+        res.write(body + madeTitle);
+        res.end();
       });
     });
 
-  req.on('error', function (e) {
+  request.on('error', function (e) {
     console.log('problem with request: ' + e.message);
   });
-  req.end();
+  request.end();
 }
 
 function upload(response, postData) {
@@ -82,10 +84,6 @@ function upload(response, postData) {
 	response.writeHead(200, {'Content-Type': 'text/plain'});
 	response.write('You have sent: ' + postData);
 	response.end();
-}
-
-function css(response, postData) {
-    response.writeHead(200, )
 }
 
 
